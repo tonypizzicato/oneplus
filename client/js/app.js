@@ -11,10 +11,16 @@ $(document).ready(function () {
 
     socket.on('invite', function (data) {
 
-        if (data.response.indexOf('No invite with that code exists') > -1) {
+        if (!data.response || data.response.indexOf('No invite with that code exists') > -1) {
             var h = $('<h4></h4>').text('No such invite ' + data.id);
 
             $('body').append(h);
+
+            if (data.error) {
+                var err = $('<p></p>').text(data.error);
+
+                $('body').append(err);
+            }
 
             _.delay(socket.emit.bind(socket), 1000, 'generate');
         } else {
@@ -23,5 +29,7 @@ $(document).ready(function () {
                 div = $('<div></div>').html(data.response);
             $('body').html('').append(h).append(a).append(div);
         }
+
+        $("html, body").animate({scrollTop: $(document).height()}, 1000);
     })
 });

@@ -33,14 +33,19 @@ function checkInvite(socket) {
     var body = '',
         id = makeid();
 
-    https.get(url + id, function (resp) {
-        resp.on('data', function (chunk) {
-            body += chunk;
+    try {
+        https.get(url + id, function (resp) {
+            resp.on('data', function (chunk) {
+                body += chunk;
+            });
+            resp.on('end', function () {
+                socket.emit('invite', {id: id, response: body, url: url + id});
+            });
         });
-        resp.on('end', function () {
-            socket.emit('invite', {id: id, response: body, url: url + id});
-        });
-    });
+    } catch (err) {
+        console.log('error: ' + err.message);
+        socket.emit('invite', {id: id, error: err.message, url: url + id});
+    }
 
     console.log('new invite checking');
 }
